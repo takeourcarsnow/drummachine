@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Drum Machine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+             <h1>> Terminal Drum Machine v2.0_</h1>
+             <div class="status-bar">
+                <span id="status">Ready...</span>
+                 <span id="time">00:00:00</span>
+           </div>
+        </header>
+
+        <div class="main-controls">
+            <div class="transport-controls">
+                 <button id="playButton" class="main-btn">START</button>
+                <div class="bpm-controls">
+                    <button onclick="drumMachine.adjustBPM(5)" class="ctrl-btn">BPM +</button>
+                   <button onclick="drumMachine.adjustBPM(-5)" class="ctrl-btn">BPM -</button>
+                 </div>
+                  <div class="step-controls">
+                       <button onclick="drumMachine.adjustSteps(4)" class="ctrl-btn">+ STEPS</button>
+                    <button onclick="drumMachine.adjustSteps(-4)" class="ctrl-btn">- STEPS</button>
+                </div>
+                <button onclick="drumMachine.clearPatterns()" class="ctrl-btn">CLEAR ALL</button>
+            </div>
+           <div class="pattern-controls">
+                <button onclick="drumMachine.loadPreset('basic')">Basic Pattern</button>
+                <button onclick="drumMachine.loadPreset('breakbeat')">Breakbeat</button>
+                <div class="swing-control">
+                   <label>Swing</label>
+                    <input type="range" id="swingAmount" min="0" max="1" step="0.1" value="0"
+                           onchange="drumMachine.setSwing(this.value)">
+                </div>
+            </div>
+
+
+            <div class="visualization-controls">
+                <button onclick="drumMachine.setVisualizerType('waveform')">Waveform</button>
+                <button onclick="drumMachine.setVisualizerType('spectrum')">Spectrum</button>
+                <button onclick="drumMachine.setVisualizerType('circular')">Circular</button>
+                <button onclick="drumMachine.setVisualizerType('matrix')">Matrix</button>
+                 <button onclick="drumMachine.setVisualizerType('particles')">Particles</button>
+                 <button onclick="drumMachine.setVisualizerType('bars')">Bars</button>
+                <button onclick="drumMachine.setVisualizerType('scope')">Scope</button>
+            </div>
+             <div class="track-tools">
+                <button onclick="drumMachine.randomizeTrack(drumMachine.selectedTrack, 0.25)">Randomize</button>
+                <button onclick="drumMachine.shiftTrack(drumMachine.selectedTrack, 1)">Shift →</button>
+                <button onclick="drumMachine.shiftTrack(drumMachine.selectedTrack, -1)">← Shift</button>
+                <button onclick="drumMachine.invertTrack(drumMachine.selectedTrack)">Invert</button>
+            </div>
+             <div class="effects-controls">
+                <div class="effect-group">
+                   <label>Reverb</label>
+                    <input type="range" id="reverbMix" min="0" max="1" step="0.1" value="0.3">
+               </div>
+                 <div class="effect-group">
+                    <label>Delay</label>
+                   <input type="range" id="delayMix" min="0" max="1" step="0.1" value="0.2">
+                </div>
+               <div class="effect-group">
+                   <label>Distortion</label>
+                   <input type="range" id="distortionMix" min="0" max="1" step="0.1" value="0">
+                </div>
+           </div>
+        </div>
+
+        <div id="info" class="info-panel"></div>
+        
+          <div class="visualizer-container">
+            <canvas id="visualizer"></canvas>
+            <canvas id="bgVisualizer"></canvas>
+             <div class="visualizer-labels">
+                <span id="visualizer-type">Waveform</span>
+               <span id="peak-meter">Peak: -∞dB</span>
+            </div>
+        </div>
+       <div id="sequencer" class="sequencer"></div>
+
+        <div class="keyboard-shortcuts">
+            <h3>> Keyboard Shortcuts_</h3>
+            <ul>
+                <li>SPACE - Play/Stop</li>
+                <li>← → - Adjust Steps</li>
+                <li>↑ ↓ - Adjust BPM</li>
+                 <li>1-7 - Toggle Tracks</li>
+                 <li>C - Clear Pattern</li>
+                 <li>R - Randomize Selected</li>
+               <li>S - Shift Right</li>
+               <li>A - Shift Left</li>
+                 <li>I - Invert Pattern</li>
+                <li>V - Next Visualizer</li>
+             </ul>
+       </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
