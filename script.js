@@ -60,90 +60,94 @@ class DrumMachine {
     }
 	
 	initAudio() {
-        // Kick
-        this.kick = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 6,
-            oscillator: { type: 'triangle' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.4,
-                sustain: 0,
-                release: 0.4
-            }
-        }).toDestination();
+        this.initInstruments();
+    }
 
-        // Snare
-        this.snare = new Tone.NoiseSynth({
-            noise: { type: 'white' },
-            envelope: {
-                attack: 0.005,
-                decay: 0.1,
-                sustain: 0,
-                release: 0.1
-            }
-        }).connect(new Tone.Filter(3000, "highpass")).toDestination();
+    initInstruments() {
+        this.instruments = {
+            kick: new Tone.MembraneSynth({
+                pitchDecay: 0.05,
+                octaves: 5,
+                oscillator: { type: 'triangle' },
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.4,
+                    sustain: 0.01,
+                    release: 0.4
+                }
+            }).set({ volume: -6 }),
 
-        // Hi-hat
-        this.hihat = new Tone.NoiseSynth({
-            noise: { type: 'white' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.05,
-                sustain: 0,
-                release: 0.05
-            }
-        }).connect(new Tone.Filter(8000, "highpass")).toDestination();
-        this.hihat.volume.value = -10;
+            snare: new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: {
+                    attack: 0.005,
+                    decay: 0.15,
+                    sustain: 0,
+                    release: 0.1
+                }
+            }).chain(new Tone.Filter(3000, "highpass")).set({ volume: -8 }),
 
-        // Clap
-        this.clap = new Tone.NoiseSynth({
-            noise: { type: 'pink' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.2,
-                sustain: 0,
-                release: 0.1
-            }
-        }).connect(new Tone.Filter(1000, "bandpass")).toDestination();
-        this.clap.volume.value = -5;
+            hihat: new Tone.NoiseSynth({
+                noise: { type: 'white' },
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.05,
+                    sustain: 0,
+                    release: 0.04
+                }
+            }).chain(new Tone.Filter(9000, "highpass")).set({ volume: -12 }),
 
-        // Tom
-        this.tom = new Tone.MembraneSynth({
-            pitchDecay: 0.05,
-            octaves: 4,
-            oscillator: { type: 'sine' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.2,
-                sustain: 0,
-                release: 0.2
-            }
-        }).toDestination();
+            clap: new Tone.NoiseSynth({
+                noise: { type: 'pink' },
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.2,
+                    sustain: 0,
+                    release: 0.1
+                }
+            }).chain(new Tone.Filter(1500, "bandpass")).set({ volume: -10 }),
 
-        // Rim
-        this.rim = new Tone.NoiseSynth({
-            noise: { type: 'pink' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.03,
-                sustain: 0,
-                release: 0.02
-            }
-        }).connect(new Tone.Filter(5000, "bandpass")).toDestination();
-        this.rim.volume.value = -15;
+            tom: new Tone.MembraneSynth({
+                pitchDecay: 0.05,
+                octaves: 3,
+                oscillator: { type: 'sine' },
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.2,
+                    sustain: 0,
+                    release: 0.2
+                }
+            }).set({ volume: -8 }),
 
-        // Cymbal
-        this.cymbal = new Tone.NoiseSynth({
-            noise: { type: 'white' },
-            envelope: {
-                attack: 0.001,
-                decay: 0.3,
-                sustain: 0.1,
-                release: 0.3
-            }
-        }).connect(new Tone.Filter(8000, "highpass")).toDestination();
-        this.cymbal.volume.value = -20;
+            rim: new Tone.MetalSynth({
+                frequency: 800,
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.1,
+                    release: 0.01
+                },
+                harmonicity: 5.1,
+                modulationIndex: 32,
+                resonance: 4000,
+                octaves: 1.5
+            }).set({ volume: -20 }),
+
+            cymbal: new Tone.MetalSynth({
+                frequency: 200,
+                envelope: {
+                    attack: 0.001,
+                    decay: 0.3,
+                    release: 0.3
+                },
+                harmonicity: 5.1,
+                modulationIndex: 32,
+                resonance: 1000,
+                octaves: 1.5
+            }).chain(new Tone.Filter(8000, "highpass")).set({ volume: -20 })
+        };
+
+        // Connect all instruments to destination
+        Object.values(this.instruments).forEach(inst => inst.toDestination());
     }
 
     initEffects() {
@@ -168,7 +172,7 @@ class DrumMachine {
         }).toDestination();
 
         // Chain effects
-        [this.kick, this.snare, this.hihat, this.clap, this.tom, this.rim, this.cymbal].forEach(inst => {
+        [this.instruments.kick, this.instruments.snare, this.instruments.hihat, this.instruments.clap, this.instruments.tom, this.instruments.rim, this.instruments.cymbal].forEach(inst => {
             inst.disconnect();
             inst.chain(this.distortion, this.reverb, this.delay, Tone.Destination);
         });
@@ -318,7 +322,7 @@ class DrumMachine {
             const step = parseInt(cell.dataset.step);
 
             if (instrument && !isNaN(step)) {
-                this.toggleCell(instrument, step);
+                this.toggleStep(instrument, step);
                 
                 // Enable drag functionality
                 this.isDragging = true;
@@ -366,7 +370,7 @@ class DrumMachine {
 
             if (instrument && !isNaN(step)) {
                 e.preventDefault();
-                this.toggleCell(instrument, step);
+                this.toggleStep(instrument, step);
             }
         }, { passive: false });
     }
@@ -385,18 +389,17 @@ class DrumMachine {
         animate(performance.now());
     }
 
-    toggleCell(instrument, step) {
-        if (!this.patterns[instrument]) return;
-        
-        // Update pattern immediately
+    toggleStep(instrument, step) {
+        // Toggle the step in the pattern without triggering sound
         this.patterns[instrument][step] = !this.patterns[instrument][step];
         
-        // Update visual state without full grid redraw
-        this.updateCell(instrument, step);
-        
-        // Preview sound if cell is activated
-        if (this.patterns[instrument][step]) {
-            this.triggerInstrument(instrument, Tone.now(), 0.7);
+        // Update the visual state of the cell
+        const track = document.querySelector(`[data-instrument="${instrument}"]`);
+        if (track) {
+            const cell = track.querySelector(`[data-step="${step}"]`);
+            if (cell) {
+                cell.classList.toggle('active', this.patterns[instrument][step]);
+            }
         }
     }
 
@@ -741,25 +744,25 @@ class DrumMachine {
     triggerInstrument(instrument, time, velocity = 1) {
         switch (instrument) {
             case 'kick':
-                this.kick.triggerAttackRelease('C1', '8n', time, velocity);
+                this.instruments.kick.triggerAttackRelease('C1', '8n', time, velocity * 0.9);
                 break;
             case 'snare':
-                this.snare.triggerAttackRelease('8n', time, velocity * 0.7);
+                this.instruments.snare.triggerAttackRelease('16n', time, velocity * 0.7);
                 break;
             case 'hihat':
-                this.hihat.triggerAttackRelease('32n', time, velocity * 0.5);
+                this.instruments.hihat.triggerAttackRelease('32n', time, velocity * 0.5);
                 break;
             case 'clap':
-                this.clap.triggerAttackRelease('8n', time, velocity * 0.8);
+                this.instruments.clap.triggerAttackRelease('16n', time, velocity * 0.6);
                 break;
             case 'tom':
-                this.tom.triggerAttackRelease('G2', '8n', time, velocity * 0.9);
+                this.instruments.tom.triggerAttackRelease('G2', '8n', time, velocity * 0.7);
                 break;
             case 'rim':
-                this.rim.triggerAttackRelease('32n', time, velocity * 0.5);
+                this.instruments.rim.triggerAttackRelease('32n', time, velocity * 0.4);
                 break;
             case 'cymbal':
-                this.cymbal.triggerAttackRelease('4n', time, velocity * 0.4);
+                this.instruments.cymbal.triggerAttackRelease('4n', time, velocity * 0.3);
                 break;
         }
     }
