@@ -24,6 +24,8 @@ body {
     font-family: 'Courier New', monospace;
     line-height: 1.6;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Layout */
@@ -31,45 +33,44 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    will-change: transform;
 }
 
 header {
     margin-bottom: 30px;
-     border-bottom: 1px solid var(--main-color);
-     padding-bottom: 15px;
-     display: flex;
+    border-bottom: 1px solid var(--main-color);
+    padding-bottom: 15px;
+    display: flex;
     justify-content: space-between;
     align-items: center;
-
 }
+
 h1 {
     font-size: 2em;
     text-shadow: var(--text-shadow);
-   margin-bottom: 10px;
+    margin-bottom: 10px;
 }
+
 .status-bar {
     display: flex;
     gap: 15px;
 }
+
 /* Controls */
 .main-controls {
     margin-bottom: 30px;
 }
-.transport-controls{
-  display: flex;
-  align-items: center;
-  gap: 15px;
-    margin-bottom: 20px;
-}
-.bpm-controls, .step-controls{
+
+.transport-controls {
     display: flex;
-    gap: 10px;
-}
-.controls {
-    display: flex;
+    align-items: center;
     gap: 15px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
+}
+
+.bpm-controls, .step-controls {
+    display: flex;
+    gap: 10px;
 }
 
 button {
@@ -79,9 +80,12 @@ button {
     padding: 10px 20px;
     cursor: pointer;
     font-family: 'Courier New', monospace;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 button:hover {
@@ -97,6 +101,7 @@ button:active {
     min-width: 120px;
     font-weight: bold;
 }
+
 /* Pattern Controls */
 .pattern-controls {
     display: flex;
@@ -104,7 +109,7 @@ button:active {
     margin: 20px 0;
     padding: 15px;
     background-color: rgba(0, 255, 0, 0.05);
-   border: 1px solid rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.1);
 }
 
 .swing-control {
@@ -125,7 +130,7 @@ button:active {
     display: flex;
     gap: 10px;
     margin: 20px 0;
-   flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 .visualizer-container {
@@ -135,6 +140,8 @@ button:active {
     background-color: rgba(0, 0, 0, 0.9);
     border: 1px solid var(--main-color);
     overflow: hidden;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 #visualizer, #bgVisualizer {
@@ -143,6 +150,7 @@ button:active {
     left: 0;
     width: 100%;
     height: 100%;
+    will-change: transform;
 }
 
 #bgVisualizer {
@@ -180,7 +188,7 @@ button:active {
     left: 10px;
     right: 10px;
     display: flex;
-   justify-content: space-between;
+    justify-content: space-between;
     color: var(--main-color);
     font-size: 0.8em;
     z-index: 4;
@@ -188,10 +196,10 @@ button:active {
 
 /* Effects controls */
 .effects-controls {
-   display: grid;
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-     margin-top: 20px;
+    margin-top: 20px;
     padding: 15px;
     background-color: rgba(0, 255, 0, 0.05);
     border: 1px solid rgba(0, 255, 0, 0.1);
@@ -219,23 +227,24 @@ input[type="range"]::-webkit-slider-thumb {
     background: var(--main-color);
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
     box-shadow: var(--glow);
 }
+
 /* Sequencer Grid */
 .sequencer {
     margin: 20px 0;
 }
 
 .track {
-   margin-bottom: 25px;
+    margin-bottom: 25px;
     padding: 10px;
     background-color: rgba(0, 255, 0, 0.05);
-   border: 1px solid rgba(0, 255, 0, 0.1);
-    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 255, 0, 0.1);
+    transition: all 0.2s ease;
 }
 
 .track:hover {
@@ -267,7 +276,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .grid {
     display: grid;
-   gap: 3px;
+    gap: 3px;
     margin: 5px 0;
 }
 
@@ -278,6 +287,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
     cursor: pointer;
     transition: all 0.2s ease;
     background-color: rgba(0, 0, 0, 0.8);
+    will-change: background-color, border-color;
+    transform: translateZ(0);
 }
 
 .cell:hover {
@@ -306,6 +317,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     opacity: 0.3;
     animation: pulse 0.5s infinite;
 }
+
 /* Info panel */
 .info-panel {
     background-color: rgba(0, 255, 0, 0.05);
@@ -325,17 +337,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .keyboard-shortcuts ul {
     list-style: none;
-   display: grid;
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-   gap: 10px;
+    gap: 10px;
     margin-top: 10px;
 }
 
 /* Animations */
 @keyframes pulse {
-    0% { opacity: 0.3; }
+    0%, 100% { opacity: 0.3; }
     50% { opacity: 0.1; }
-    100% { opacity: 0.3; }
 }
 
 /* Responsive Design */
@@ -344,34 +355,51 @@ input[type="range"]::-webkit-slider-thumb:hover {
         padding: 10px;
     }
 
-   .container {
-       padding: 10px;
-   }
-   .transport-controls {
-       flex-direction: column;
-   }
-    .controls, .pattern-controls, .track-tools, .visualization-controls {
-       flex-direction: column;
-   }
+    .container {
+        padding: 10px;
+    }
 
-  .controls button, .pattern-controls button,
-   .track-tools button, .visualization-controls button {
-       width: 100%;
-   }
+    .transport-controls {
+        flex-direction: column;
+    }
+
+    .controls, .pattern-controls, .track-tools, .visualization-controls {
+        flex-direction: column;
+    }
+
+    .controls button, .pattern-controls button,
+    .track-tools button, .visualization-controls button {
+        width: 100%;
+        min-height: 44px;
+    }
 
     .effects-controls {
-       grid-template-columns: 1fr;
-   }
+        grid-template-columns: 1fr;
+    }
+
     .cell {
-        height: 45px;
+        height: 44px;
     }
 
     .keyboard-shortcuts {
-       display: none;
-   }
- .visualizer-container {
-       height: 200px;
-   }
+        display: none;
+    }
+
+    .visualizer-container {
+        height: 150px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) {
+    .cell {
+        min-height: 44px;
+    }
+    
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
 }
 
 /* Custom Scrollbar */
