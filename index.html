@@ -5,98 +5,109 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Terminal Drum Machine</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" defer></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>> Terminal Drum Machine v2.0_</h1>
-            <div class="status-bar">
-                <span id="status">Ready...</span>
-                <span id="time">00:00:00</span>
+            <div class="header-content">
+                <h1>TERMINAL DRUM MACHINE</h1>
+                <div class="status-panel">
+                    <span id="status">Ready...</span>
+                    <span id="time">00:00:00</span>
+                </div>
             </div>
         </header>
 
-        <div class="main-controls">
-            <div class="transport-controls">
-                <button id="playButton" class="main-btn">START</button>
-                <div class="bpm-controls">
-                    <button data-action="adjustBPM" data-value="5" class="ctrl-btn">BPM +</button>
-                    <button data-action="adjustBPM" data-value="-5" class="ctrl-btn">BPM -</button>
+        <div class="main-section">
+            <div class="control-panel">
+                <div class="transport-panel">
+                    <button id="playButton" class="main-btn">START</button>
+                    <div class="tempo-controls">
+                        <button data-action="adjustBPM" data-value="5" class="ctrl-btn">BPM +</button>
+                        <button data-action="adjustBPM" data-value="-5" class="ctrl-btn">BPM -</button>
+                    </div>
+                    <div class="step-controls">
+                        <button data-action="adjustSteps" data-value="4" class="ctrl-btn">+ STEPS</button>
+                        <button data-action="adjustSteps" data-value="-4" class="ctrl-btn">- STEPS</button>
+                    </div>
+                    <button data-action="clearPatterns" class="ctrl-btn danger">CLEAR ALL</button>
                 </div>
-                <div class="step-controls">
-                    <button data-action="adjustSteps" data-value="4" class="ctrl-btn">+ STEPS</button>
-                    <button data-action="adjustSteps" data-value="-4" class="ctrl-btn">- STEPS</button>
+
+                <div class="pattern-panel">
+                    <div class="preset-controls">
+                        <button data-action="loadPreset" data-value="basic" class="preset-btn">Basic Pattern</button>
+                        <button data-action="loadPreset" data-value="breakbeat" class="preset-btn">Breakbeat</button>
+                    </div>
+                    <div class="swing-control">
+                        <label>Swing</label>
+                        <input type="range" id="swingAmount" min="0" max="1" step="0.1" value="0">
+                    </div>
                 </div>
-                <button data-action="clearPatterns" class="ctrl-btn">CLEAR ALL</button>
-            </div>
-            <div class="pattern-controls">
-                <button data-action="loadPreset" data-value="basic">Basic Pattern</button>
-                <button data-action="loadPreset" data-value="breakbeat">Breakbeat</button>
-                <div class="swing-control">
-                    <label>Swing</label>
-                    <input type="range" id="swingAmount" min="0" max="1" step="0.1" value="0">
+
+                <div class="visualizer-panel">
+                    <button data-action="setVisualizerType" data-value="waveform">Waveform</button>
+                    <button data-action="setVisualizerType" data-value="spectrum">Spectrum</button>
+                    <button data-action="setVisualizerType" data-value="circular">Circular</button>
+                    <button data-action="setVisualizerType" data-value="matrix">Matrix</button>
+                    <button data-action="setVisualizerType" data-value="particles">Particles</button>
+                    <button data-action="setVisualizerType" data-value="bars">Bars</button>
+                    <button data-action="setVisualizerType" data-value="scope">Scope</button>
+                </div>
+
+                <div class="track-tools">
+                    <button data-action="randomizeTrack" data-value="0.25">Randomize</button>
+                    <button data-action="shiftTrack" data-value="1">Shift →</button>
+                    <button data-action="shiftTrack" data-value="-1">← Shift</button>
+                    <button data-action="invertTrack">Invert</button>
+                </div>
+
+                <div class="effects-panel">
+                    <div class="effect-group">
+                        <label>Reverb</label>
+                        <input type="range" id="reverbMix" min="0" max="1" step="0.1" value="0.3">
+                    </div>
+                    <div class="effect-group">
+                        <label>Delay</label>
+                        <input type="range" id="delayMix" min="0" max="1" step="0.1" value="0.2">
+                    </div>
+                    <div class="effect-group">
+                        <label>Distortion</label>
+                        <input type="range" id="distortionMix" min="0" max="1" step="0.1" value="0">
+                    </div>
                 </div>
             </div>
 
-            <div class="visualization-controls">
-                <button data-action="setVisualizerType" data-value="waveform">Waveform</button>
-                <button data-action="setVisualizerType" data-value="spectrum">Spectrum</button>
-                <button data-action="setVisualizerType" data-value="circular">Circular</button>
-                <button data-action="setVisualizerType" data-value="matrix">Matrix</button>
-                <button data-action="setVisualizerType" data-value="particles">Particles</button>
-                <button data-action="setVisualizerType" data-value="bars">Bars</button>
-                <button data-action="setVisualizerType" data-value="scope">Scope</button>
-            </div>
-            <div class="track-tools">
-                <button data-action="randomizeTrack" data-value="0.25">Randomize</button>
-                <button data-action="shiftTrack" data-value="1">Shift →</button>
-                <button data-action="shiftTrack" data-value="-1">← Shift</button>
-                <button data-action="invertTrack">Invert</button>
-            </div>
-            <div class="effects-controls">
-                <div class="effect-group">
-                    <label>Reverb</label>
-                    <input type="range" id="reverbMix" min="0" max="1" step="0.1" value="0.3">
-                </div>
-                <div class="effect-group">
-                    <label>Delay</label>
-                    <input type="range" id="delayMix" min="0" max="1" step="0.1" value="0.2">
-                </div>
-                <div class="effect-group">
-                    <label>Distortion</label>
-                    <input type="range" id="distortionMix" min="0" max="1" step="0.1" value="0">
+            <div id="info" class="info-panel"></div>
+            
+            <div class="visualizer-container">
+                <canvas id="visualizer"></canvas>
+                <canvas id="bgVisualizer"></canvas>
+                <div class="visualizer-labels">
+                    <span id="visualizer-type">Waveform</span>
+                    <span id="peak-meter">Peak: -∞dB</span>
                 </div>
             </div>
-        </div>
 
-        <div id="info" class="info-panel"></div>
-        
-        <div class="visualizer-container">
-            <canvas id="visualizer"></canvas>
-            <canvas id="bgVisualizer"></canvas>
-            <div class="visualizer-labels">
-                <span id="visualizer-type">Waveform</span>
-                <span id="peak-meter">Peak: -∞dB</span>
-            </div>
+            <div id="sequencer" class="sequencer"></div>
         </div>
-        <div id="sequencer" class="sequencer"></div>
 
         <div class="keyboard-shortcuts">
-            <h3>> Keyboard Shortcuts_</h3>
-            <ul>
-                <li>SPACE - Play/Stop</li>
-                <li>← → - Adjust Steps</li>
-                <li>↑ ↓ - Adjust BPM</li>
-                <li>1-7 - Toggle Tracks</li>
-                <li>C - Clear Pattern</li>
-                <li>R - Randomize Selected</li>
-                <li>S - Shift Right</li>
-                <li>A - Shift Left</li>
-                <li>I - Invert Pattern</li>
-                <li>V - Next Visualizer</li>
-            </ul>
+            <h3>Keyboard Shortcuts</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut"><span>SPACE</span>Play/Stop</div>
+                <div class="shortcut"><span>← →</span>Adjust Steps</div>
+                <div class="shortcut"><span>↑ ↓</span>Adjust BPM</div>
+                <div class="shortcut"><span>1-7</span>Toggle Tracks</div>
+                <div class="shortcut"><span>C</span>Clear Pattern</div>
+                <div class="shortcut"><span>R</span>Randomize</div>
+                <div class="shortcut"><span>S</span>Shift Right</div>
+                <div class="shortcut"><span>A</span>Shift Left</div>
+                <div class="shortcut"><span>I</span>Invert Pattern</div>
+                <div class="shortcut"><span>V</span>Next Visualizer</div>
+            </div>
         </div>
     </div>
     <script src="script.js" defer></script>
