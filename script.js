@@ -212,6 +212,42 @@ class DrumMachine {
     }
         
         setupEventListeners() {
+			// Add inside setupEventListeners()
+const visualizerContainer = document.querySelector('.visualizer-container');
+visualizerContainer.style.cursor = 'pointer'; // Make it look clickable
+
+visualizerContainer.addEventListener('click', (e) => {
+    // Prevent click if clicking on labels
+    if (e.target.closest('.visualizer-labels')) return;
+    
+    this.nextVisualizer();
+    
+    // Optional: Add click feedback
+    const flash = document.createElement('div');
+    flash.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        pointer-events: none;
+        animation: flash 0.3s ease-out forwards;
+    `;
+    
+    visualizerContainer.appendChild(flash);
+    setTimeout(() => flash.remove(), 300);
+});
+
+// Add this to your CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes flash {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
         // Play button
         document.getElementById('playButton').addEventListener('click', () => this.togglePlay());
 
