@@ -58,8 +58,8 @@ class DrumMachine {
             this.setSwing(e.target.value);
         });
     }
-	
-	initAudio() {
+        
+        initAudio() {
         this.initInstruments();
     }
 
@@ -67,25 +67,26 @@ class DrumMachine {
         this.instruments = {
             kick: new Tone.MembraneSynth({
                 pitchDecay: 0.05,
-                octaves: 5,
-                oscillator: { type: 'triangle' },
+                octaves: 6,
+                oscillator: { type: 'sine' },
                 envelope: {
                     attack: 0.001,
-                    decay: 0.4,
-                    sustain: 0.01,
-                    release: 0.4
+                    decay: 0.2,
+                    sustain: 0,
+                    release: 0.4,
+                    attackCurve: 'exponential'
                 }
-            }).set({ volume: -6 }),
+            }).set({ volume: -2 }),
 
             snare: new Tone.NoiseSynth({
                 noise: { type: 'white' },
                 envelope: {
-                    attack: 0.005,
-                    decay: 0.15,
+                    attack: 0.001,
+                    decay: 0.2,
                     sustain: 0,
-                    release: 0.1
+                    release: 0.2
                 }
-            }).chain(new Tone.Filter(3000, "highpass")).set({ volume: -8 }),
+            }).chain(new Tone.Filter(3000, "highpass")).set({ volume: -6 }),
 
             hihat: new Tone.NoiseSynth({
                 noise: { type: 'white' },
@@ -95,21 +96,25 @@ class DrumMachine {
                     sustain: 0,
                     release: 0.04
                 }
-            }).chain(new Tone.Filter(9000, "highpass")).set({ volume: -12 }),
+            }).chain(new Tone.Filter({
+                frequency: 10000,
+                type: "highpass",
+                rolloff: -48
+            })).set({ volume: -10 }),
 
             clap: new Tone.NoiseSynth({
                 noise: { type: 'pink' },
                 envelope: {
                     attack: 0.001,
-                    decay: 0.2,
+                    decay: 0.3,
                     sustain: 0,
                     release: 0.1
                 }
-            }).chain(new Tone.Filter(1500, "bandpass")).set({ volume: -10 }),
+            }).chain(new Tone.Filter(2500, "bandpass")).set({ volume: -8 }),
 
             tom: new Tone.MembraneSynth({
                 pitchDecay: 0.05,
-                octaves: 3,
+                octaves: 4,
                 oscillator: { type: 'sine' },
                 envelope: {
                     attack: 0.001,
@@ -117,33 +122,35 @@ class DrumMachine {
                     sustain: 0,
                     release: 0.2
                 }
-            }).set({ volume: -8 }),
+            }).set({ volume: -6 }),
 
-            rim: new Tone.MetalSynth({
-                frequency: 800,
+            rim: new Tone.Synth({
+                oscillator: { type: 'square' },
                 envelope: {
                     attack: 0.001,
                     decay: 0.1,
-                    release: 0.01
-                },
-                harmonicity: 5.1,
-                modulationIndex: 32,
-                resonance: 4000,
-                octaves: 1.5
-            }).set({ volume: -20 }),
+                    sustain: 0,
+                    release: 0.1
+                }
+            }).chain(new Tone.Filter(5000, "bandpass")).set({ volume: -15 }),
 
-            cymbal: new Tone.MetalSynth({
-                frequency: 200,
+            cymbal: new Tone.NoiseSynth({
+                noise: { type: 'white' },
                 envelope: {
                     attack: 0.001,
                     decay: 0.3,
+                    sustain: 0.1,
                     release: 0.3
-                },
-                harmonicity: 5.1,
-                modulationIndex: 32,
-                resonance: 1000,
-                octaves: 1.5
-            }).chain(new Tone.Filter(8000, "highpass")).set({ volume: -20 })
+                }
+            }).chain(new Tone.Filter({
+                frequency: 8000,
+                type: "highpass",
+                rolloff: -24
+            })).chain(new Tone.Filter({
+                frequency: 12000,
+                type: "lowpass",
+                rolloff: -24
+            })).set({ volume: -15 })
         };
 
         // Connect all instruments to destination
@@ -203,8 +210,8 @@ class DrumMachine {
         this.visualizerType = 'waveform';
         this.hue = 0;
     }
-	
-	setupEventListeners() {
+        
+        setupEventListeners() {
         // Play button
         document.getElementById('playButton').addEventListener('click', () => this.togglePlay());
 
@@ -218,7 +225,8 @@ class DrumMachine {
             const instrument = button.dataset.instrument;
 
             if (action) {
-                e.preventDefault();
+				
+				e.preventDefault();
                 switch (action) {
                     case 'adjustBPM':
                         this.adjustBPM(parseInt(value));
@@ -376,211 +384,210 @@ class DrumMachine {
     }
 	
 	startAnimationLoop() {
-        let lastTime = performance.now();
-        const animate = (currentTime) => {
-            this.animationFrameId = requestAnimationFrame(animate);
-            
-            const deltaTime = currentTime - lastTime;
-            if (deltaTime >= this.frameInterval) {
-                this.drawVisualizer();
-                lastTime = currentTime - (deltaTime % this.frameInterval);
-            }
-        };
-        animate(performance.now());
-    }
-
-    toggleStep(instrument, step) {
-        // Toggle the step in the pattern without triggering sound
-        this.patterns[instrument][step] = !this.patterns[instrument][step];
+    let lastTime = performance.now();
+    const animate = (currentTime) => {
+        this.animationFrameId = requestAnimationFrame(animate);
         
-        // Update the visual state of the cell
-        const track = document.querySelector(`[data-instrument="${instrument}"]`);
-        if (track) {
-            const cell = track.querySelector(`[data-step="${step}"]`);
-            if (cell) {
-                cell.classList.toggle('active', this.patterns[instrument][step]);
-            }
+        const deltaTime = currentTime - lastTime;
+        if (deltaTime >= this.frameInterval) {
+            this.drawVisualizer();
+            lastTime = currentTime - (deltaTime % this.frameInterval);
+        }
+    };
+    animate(performance.now());
+}
+
+toggleStep(instrument, step) {
+    // Toggle the step in the pattern without triggering sound
+    this.patterns[instrument][step] = !this.patterns[instrument][step];
+    
+    // Update the visual state of the cell
+    const track = document.querySelector(`[data-instrument="${instrument}"]`);
+    if (track) {
+        const cell = track.querySelector(`[data-step="${step}"]`);
+        if (cell) {
+            cell.classList.toggle('active', this.patterns[instrument][step]);
         }
     }
+}
 
-    updateCell(instrument, step) {
-        const track = document.querySelector(`[data-instrument="${instrument}"]`);
-        if (!track) return;
+updateCell(instrument, step) {
+    const track = document.querySelector(`[data-instrument="${instrument}"]`);
+    if (!track) return;
 
-        const cell = track.querySelectorAll('.cell')[step];
-        if (!cell) return;
+    const cell = track.querySelectorAll('.cell')[step];
+    if (!cell) return;
 
-        // Update just this cell's state
-        cell.classList.toggle('active', this.patterns[instrument][step]);
-        if (step === this.currentStep) {
-            cell.classList.add('current');
-        }
+    // Update just this cell's state
+    cell.classList.toggle('active', this.patterns[instrument][step]);
+    if (step === this.currentStep) {
+        cell.classList.add('current');
     }
+}
 
-    drawVisualizer() {
-        if (!this.canvas || !this.ctx) return;
+drawVisualizer() {
+    if (!this.canvas || !this.ctx) return;
 
-        const width = this.canvas.width = this.canvas.offsetWidth;
-        const height = this.canvas.height = this.canvas.offsetHeight;
-        this.bgCanvas.width = width;
-        this.bgCanvas.height = height;
+    const width = this.canvas.width = this.canvas.offsetWidth;
+    const height = this.canvas.height = this.canvas.offsetHeight;
+    this.bgCanvas.width = width;
+    this.bgCanvas.height = height;
 
-        // Clear canvases
-        this.ctx.clearRect(0, 0, width, height);
-        this.bgCtx.clearRect(0, 0, width, height);
+    // Clear canvases
+    this.ctx.clearRect(0, 0, width, height);
+    this.bgCtx.clearRect(0, 0, width, height);
 
-        // Update hue
-        this.hue = (this.hue + 0.5) % 360;
+    // Update hue
+    this.hue = (this.hue + 0.5) % 360;
 
-        try {
-            switch (this.visualizerType) {
-                case 'waveform':
-                    this.drawWaveform(width, height);
-                    break;
-                case 'spectrum':
-                    this.drawSpectrum(width, height);
-                    break;
-                case 'circular':
-                    this.drawCircular(width, height);
-                    break;
-                case 'matrix':
-                    this.drawMatrix(width, height);
-                    break;
-                case 'particles':
-                    this.drawParticles(width, height);
-                    break;
-                case 'bars':
-                    this.drawBars(width, height);
-                    break;
-                case 'scope':
-                    this.drawScope(width, height);
-                    break;
-            }
-
-            // Draw beat indicators if playing
-            if (this.playing) {
-                this.drawBeatIndicators(width, height);
-            }
-
-            // Update meters
-            const level = this.analyzers.meter.getValue();
-            document.getElementById('peak-meter').textContent = 
-                `Peak: ${level.toFixed(1)}dB`;
-            document.getElementById('visualizer-type').textContent = 
-                this.visualizerType;
-
-        } catch (error) {
-            console.error('Visualizer error:', error);
+    try {
+        switch (this.visualizerType) {
+            case 'waveform':
+                this.drawWaveform(width, height);
+                break;
+            case 'spectrum':
+                this.drawSpectrum(width, height);
+                break;
+            case 'circular':
+                this.drawCircular(width, height);
+                break;
+            case 'matrix':
+                this.drawMatrix(width, height);
+                break;
+            case 'particles':
+                this.drawParticles(width, height);
+                break;
+            case 'bars':
+                this.drawBars(width, height);
+                break;
+            case 'scope':
+                this.drawScope(width, height);
+                break;
         }
-    }
 
-    drawBeatIndicators(width, height) {
-        const beatSize = 4;
-        const spacing = width / this.steps;
-
-        for (let i = 0; i < this.steps; i++) {
-            const x = i * spacing + spacing / 2;
-            this.ctx.beginPath();
-            this.ctx.arc(x, height - 10, beatSize, 0, Math.PI * 2);
-            this.ctx.fillStyle = i === this.currentStep ? '#0ff' : '#0f0';
-            this.ctx.fill();
+        // Draw beat indicators if playing
+        if (this.playing) {
+            this.drawBeatIndicators(width, height);
         }
-    }
 
-    drawWaveform(width, height) {
-        const data = this.analyzers.waveform.getValue();
-        
+        // Update meters
+        const level = this.analyzers.meter.getValue();
+        document.getElementById('peak-meter').textContent = 
+            `Peak: ${level.toFixed(1)}dB`;
+        document.getElementById('visualizer-type').textContent = 
+            this.visualizerType;
+
+    } catch (error) {
+        console.error('Visualizer error:', error);
+    }
+}
+
+drawBeatIndicators(width, height) {
+    const beatSize = 4;
+    const spacing = width / this.steps;
+
+    for (let i = 0; i < this.steps; i++) {
+        const x = i * spacing + spacing / 2;
         this.ctx.beginPath();
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeStyle = '#0f0';
-
-        const sliceWidth = width / data.length;
-        let x = 0;
-
-        this.ctx.moveTo(0, height / 2);
-        for (let i = 0; i < data.length; i++) {
-            const y = (data[i] * height / 2) + height / 2;
-            this.ctx.lineTo(x, y);
-            x += sliceWidth;
-        }
-
-        this.ctx.lineTo(width, height / 2);
-        this.ctx.stroke();
+        this.ctx.arc(x, height - 10, beatSize, 0, Math.PI * 2);
+        this.ctx.fillStyle = i === this.currentStep ? '#0ff' : '#0f0';
+        this.ctx.fill();
     }
-	
-	drawSpectrum(width, height) {
-        const data = this.analyzers.spectrum.getValue();
-        const barWidth = width / data.length;
-        
-        for (let i = 0; i < data.length; i++) {
-            const barHeight = Math.max(0, Math.min(height, 
-                (data[i] + 140) * 2));
-            const hue = (this.hue + i * 2) % 360;
-            this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.7)`;
-            this.ctx.fillRect(
-                i * barWidth,
-                height - barHeight,
-                barWidth * 0.8,
-                barHeight
-            );
-        }
+}
+
+drawWaveform(width, height) {
+    const data = this.analyzers.waveform.getValue();
+    
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = '#0f0';
+
+    const sliceWidth = width / data.length;
+    let x = 0;
+
+    this.ctx.moveTo(0, height / 2);
+    for (let i = 0; i < data.length; i++) {
+        const y = (data[i] * height / 2) + height / 2;
+        this.ctx.lineTo(x, y);
+        x += sliceWidth;
     }
 
-    drawCircular(width, height) {
-        const data = this.analyzers.waveform.getValue();
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const radius = Math.min(width, height) / 2 - 20;
-        const angleIncrement = (Math.PI * 2) / data.length;
+    this.ctx.lineTo(width, height / 2);
+    this.ctx.stroke();
+}
 
-        for (let i = 0; i < data.length; i++) {
-            const angle = i * angleIncrement;
-            const dataValue = (data[i] + 1) * (radius / 2);
-            const x = centerX + Math.cos(angle) * dataValue;
-            const y = centerY + Math.sin(angle) * dataValue;
+drawSpectrum(width, height) {
+    const data = this.analyzers.spectrum.getValue();
+    const barWidth = width / data.length;
+    
+    for (let i = 0; i < data.length; i++) {
+        const barHeight = Math.max(0, Math.min(height, 
+            (data[i] + 140) * 2));
+        const hue = (this.hue + i * 2) % 360;
+        this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.7)`;
+        this.ctx.fillRect(
+            i * barWidth,
+            height - barHeight,
+            barWidth * 0.8,
+            barHeight
+        );
+    }
+}
 
-            const hue = (this.hue + i * 5) % 360;
-            this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, 1, 0, Math.PI * 2);
-            this.ctx.fill();
+drawCircular(width, height) {
+    const data = this.analyzers.waveform.getValue();
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 20;
+    const angleIncrement = (Math.PI * 2) / data.length;
+
+    for (let i = 0; i < data.length; i++) {
+        const angle = i * angleIncrement;
+        const dataValue = (data[i] + 1) * (radius / 2);
+        const x = centerX + Math.cos(angle) * dataValue;
+        const y = centerY + Math.sin(angle) * dataValue;
+
+        const hue = (this.hue + i * 5) % 360;
+        this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 1, 0, Math.PI * 2);
+        this.ctx.fill();
+    }
+}
+
+drawMatrix(width, height) {
+    const data = this.analyzers.waveform.getValue();
+    const gridSize = 32;
+    const cellWidth = width / gridSize;
+    const cellHeight = height / gridSize;
+
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            const dataIndex = Math.floor((x / gridSize) * data.length);
+            const dataValue = Math.abs(data[dataIndex]);
+            const hue = (this.hue + x * 5 + y * 5) % 360;
+            this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${0.5 + dataValue * 0.5})`;
+            this.ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
         }
     }
+}
 
-    drawMatrix(width, height) {
-        const data = this.analyzers.waveform.getValue();
-        const gridSize = 32;
-        const cellWidth = width / gridSize;
-        const cellHeight = height / gridSize;
+drawParticles(width, height) {
+    const data = this.analyzers.waveform.getValue();
+    const volume = this.analyzers.meter.getValue() + 100;
+    const intensity = Math.min(1, Math.max(0, volume / 50));
 
-        for (let y = 0; y < gridSize; y++) {
-            for (let x = 0; x < gridSize; x++) {
-                const dataIndex = Math.floor((x / gridSize) * data.length);
-                const dataValue = Math.abs(data[dataIndex]);
-                const hue = (this.hue + x * 5 + y * 5) % 360;
-                this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, ${0.5 + dataValue * 0.5})`;
-                this.ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-            }
+    this.particles.forEach((particle, i) => {
+        particle.y -= particle.speed * intensity;
+        if (particle.y < 0) {
+            particle.y = 1;
+            particle.x = Math.random();
         }
-    }
 
-    drawParticles(width, height) {
-        const data = this.analyzers.waveform.getValue();
-        const volume = this.analyzers.meter.getValue() + 100;
-        const intensity = Math.min(1, Math.max(0, volume / 50));
-
-        this.particles.forEach((particle, i) => {
-            particle.y -= particle.speed * intensity;
-            if (particle.y < 0) {
-                particle.y = 1;
-                particle.x = Math.random();
-            }
-
-            const x = particle.x * width;
-            const y = particle.y * height;
-            const size = particle.size * (1 + intensity);
-
-            const dataIndex = Math.floor(particle.x * data.length);
+        const x = particle.x * width;
+        const y = particle.y * height;
+        const size = particle.size * (1 + intensity);
+		const dataIndex = Math.floor(particle.x * data.length);
             const dataValue = Math.abs(data[dataIndex]);
 
             this.ctx.beginPath();
@@ -591,29 +598,34 @@ class DrumMachine {
     }
 
     drawBars(width, height) {
-        const data = this.analyzers.spectrum.getValue();
-        const barCount = 64;
-        const barWidth = width / barCount;
-        const dataStep = Math.floor(data.length / barCount);
+    const data = this.analyzers.spectrum.getValue();
+    const barCount = 64;
+    const barWidth = width / barCount;
+    const dataStep = Math.floor(data.length / barCount);
 
-        for (let i = 0; i < barCount; i++) {
-            let sum = 0;
-            for (let j = i * dataStep; j < (i + 1) * dataStep; j++) {
-                sum += data[j] + 140;
-            }
-            const avg = sum / dataStep;
-            const barHeight = Math.max(0, Math.min(height, (avg / 15) * 2.2));
-            const hue = (this.hue + i * 2) % 360;
-            
-            this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.7)`;
-            this.ctx.fillRect(
-                i * barWidth,
-                height / 2 - barHeight / 2,
-                barWidth * 0.8,
-                barHeight
-            );
+    for (let i = 0; i < barCount; i++) {
+        let sum = 0;
+        for (let j = i * dataStep; j < (i + 1) * dataStep; j++) {
+            sum += data[j] + 140;
         }
+        const avg = sum / dataStep;
+        // Dramatically increased sensitivity
+        const barHeight = Math.max(0, Math.min(height, (avg / 2) * 4)); // Much more pronounced movement
+        const hue = (this.hue + i * 2) % 360;
+        
+        // Add some minimal height so bars are always visible
+        const minHeight = height * 0.05; // 5% of height as minimum
+        const finalHeight = Math.max(minHeight, barHeight);
+        
+        this.ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.7)`;
+        this.ctx.fillRect(
+            i * barWidth,
+            height / 2 - finalHeight / 2,
+            barWidth * 0.8,
+            finalHeight
+        );
     }
+}
 
     drawScope(width, height) {
         const data = this.analyzers.waveform.getValue();
@@ -644,8 +656,8 @@ class DrumMachine {
         this.ctx.lineWidth = 4;
         this.ctx.stroke();
     }
-	
-	updateGrid() {
+
+    updateGrid() {
         const sequencer = document.getElementById('sequencer');
         if (!sequencer) return;
         
@@ -759,10 +771,10 @@ class DrumMachine {
                 this.instruments.tom.triggerAttackRelease('G2', '8n', time, velocity * 0.7);
                 break;
             case 'rim':
-                this.instruments.rim.triggerAttackRelease('32n', time, velocity * 0.4);
+                this.instruments.rim.triggerAttackRelease('C5', '32n', time, velocity * 0.5);
                 break;
             case 'cymbal':
-                this.instruments.cymbal.triggerAttackRelease('4n', time, velocity * 0.3);
+                this.instruments.cymbal.triggerAttackRelease('16n', time, velocity * 0.4);
                 break;
         }
     }

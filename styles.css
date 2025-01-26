@@ -60,13 +60,13 @@ body {
 
 /* Layout */
 .container {
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: var(--spacing-xl);
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    gap: var(--spacing-lg);
 }
 
 /* Header Styles */
@@ -77,13 +77,15 @@ header {
     margin-bottom: var(--spacing-xl);
     box-shadow: var(--shadow-lg);
     width: 100%;
-    border: none;
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 h1 {
@@ -108,24 +110,30 @@ h1 {
 .main-section {
     display: grid;
     gap: var(--spacing-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* Control Panel */
 .control-panel {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--spacing-md);
+    align-items: start;
     background: var(--bg-secondary);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
 }
 
 /* Transport Panel */
 .transport-panel {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     gap: var(--spacing-md);
     align-items: center;
-    flex-wrap: wrap;
+    justify-content: center;
 }
 
 /* Button Styles */
@@ -141,6 +149,9 @@ button {
     transition: all var(--transition-fast);
     text-transform: uppercase;
     letter-spacing: 1px;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
 }
 
 button:hover {
@@ -179,10 +190,12 @@ button:active {
 
 /* Pattern Panel */
 .pattern-panel {
-    display: flex;
-    gap: var(--spacing-lg);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
     align-items: center;
-    padding: var(--spacing-md);
+    justify-content: center;
+    padding: var(--spacing-lg);
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
 }
@@ -212,17 +225,20 @@ button:active {
     padding: var(--spacing-md);
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
+    justify-content: center;
 }
 
 .visualizer-container {
     position: relative;
-    height: 200px;
+    aspect-ratio: 16/5;
+    height: auto;
+    max-height: 250px;
+    margin: 0 auto;
+    width: 100%;
     background: var(--bg-tertiary);
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    width: 100%;
-    border: none;
 }
 
 #visualizer, #bgVisualizer {
@@ -232,6 +248,7 @@ button:active {
     width: 100%;
     height: 100%;
     will-change: transform;
+    transform: translateZ(0);
 }
 
 .visualizer-labels {
@@ -251,9 +268,10 @@ button:active {
 /* Effects Panel */
 .effects-panel {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-lg);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    align-items: center;
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
 }
@@ -300,19 +318,25 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .sequencer {
     display: grid;
     gap: var(--spacing-md);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    max-width: 1200px;
+    margin: 0 auto;
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
 }
 
 .track {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
-    padding: var(--spacing-md);
     transition: all var(--transition-normal);
     position: relative;
     overflow: hidden;
+    will-change: transform, opacity;
 }
 
 .track:hover {
@@ -330,13 +354,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .track-name {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--spacing-md);
     align-items: center;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
     background: var(--bg-primary);
     border-radius: var(--radius-sm);
-    margin-bottom: var(--spacing-md);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -348,18 +372,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .grid {
     display: grid;
-    gap: 3px;
+    grid-template-columns: repeat(var(--steps, 16), 1fr);
+    gap: 4px;
+    padding: var(--spacing-sm);
     margin: var(--spacing-sm) 0;
 }
 
 .cell {
     position: relative;
+    aspect-ratio: 1;
+    height: auto;
+    min-height: 30px;
+    max-height: 40px;
     background: var(--bg-primary);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    height: 35px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-fast);
+    will-change: transform, opacity;
 }
 
 .cell:hover {
@@ -400,6 +430,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-secondary);
     letter-spacing: 1px;
     box-shadow: var(--shadow-sm);
+    text-align: center;
 }
 
 /* Track Tools */
@@ -410,12 +441,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
     padding: var(--spacing-md);
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
+    justify-content: center;
 }
 
 /* Keyboard Shortcuts */
 .keyboard-shortcuts {
-    margin-top: var(--spacing-xl);
-    padding: var(--spacing-lg);
+    max-width: 1200px;
+    margin: var(--spacing-xl) auto;
+    padding: var(--spacing-xl);
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
@@ -427,12 +460,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
     text-transform: uppercase;
     letter-spacing: 2px;
     font-size: 1rem;
+    text-align: center;
 }
 
 .shortcuts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    justify-content: center;
 }
 
 .shortcut {
@@ -441,6 +476,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     gap: var(--spacing-md);
     color: var(--text-secondary);
     font-size: 0.9rem;
+    justify-content: center;
 }
 
 .shortcut span {
@@ -471,6 +507,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     width: 8px;
 }
 
+/* Custom Scrollbar continued */
 ::-webkit-scrollbar-track {
     background: var(--bg-primary);
 }
@@ -492,16 +529,39 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
     .control-panel {
         grid-template-columns: 1fr;
+        padding: var(--spacing-lg);
+    }
+
+    .effects-panel {
+        grid-template-columns: 1fr;
+        padding: var(--spacing-lg);
     }
 
     .visualizer-container {
-        height: 150px;
+        max-height: 200px;
+    }
+
+    .transport-panel {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .pattern-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .preset-controls {
+        justify-content: center;
     }
 }
 
 @media (max-width: 768px) {
     body {
         font-size: 14px;
+    }
+
+    .container {
+        padding: var(--spacing-sm);
     }
 
     .header-content {
@@ -515,6 +575,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     .visualizer-panel,
     .track-tools {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .effects-panel {
@@ -524,14 +585,43 @@ input[type="range"]::-webkit-slider-thumb:hover {
     button {
         width: 100%;
         padding: var(--spacing-md);
+        min-height: 44px;
+    }
+
+    .grid {
+        gap: 3px;
     }
 
     .cell {
-        height: 44px;
+        min-height: 25px;
+        max-height: 35px;
+    }
+
+    .track-name {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+        text-align: center;
+        padding: var(--spacing-sm);
+    }
+
+    .track-controls {
+        justify-content: center;
+    }
+
+    .visualizer-container {
+        max-height: 150px;
     }
 
     .keyboard-shortcuts {
         display: none;
+    }
+
+    .effect-group {
+        align-items: center;
+    }
+
+    input[type="range"] {
+        max-width: 280px;
     }
 }
 
@@ -550,6 +640,292 @@ input[type="range"]::-webkit-slider-thumb:hover {
         transform: none;
         box-shadow: none;
     }
+
+    input[type="range"] {
+        height: 6px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 /* Focus States for Accessibility */
+button:focus,
+input:focus {
+    outline: 2px solid var(--accent-secondary);
+    outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Performance Optimizations */
+.visualizer-container,
+.cell,
+.track,
+button {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --accent-primary: #00ff00;
+        --accent-secondary: #00ffff;
+        --text-secondary: #ffffff;
+    }
+
+    .cell,
+    button,
+    input[type="range"] {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .cell.current::after {
+        animation: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .container {
+        padding: 0;
+    }
+
+    .visualizer-container,
+    .effects-panel,
+    .control-panel {
+        display: none;
+    }
+
+    .sequencer {
+        border: 1px solid #000;
+    }
+
+    .cell.active {
+        background: #000;
+    }
+}
+
+/* Width Overrides - Add at end of styles.css */
+.container {
+    max-width: 1800px;
+}
+
+.main-section,
+.sequencer,
+.control-panel,
+.effects-panel,
+.visualizer-container,
+.keyboard-shortcuts {
+    max-width: none;
+    width: 100%;
+}
+
+.grid {
+    gap: 3px;
+    padding: var(--spacing-xs);
+}
+
+.cell {
+    min-height: 35px;
+    max-height: 45px;
+}
+
+.track {
+    padding: var(--spacing-md);
+}
+
+.track-name {
+    grid-template-columns: 120px 1fr auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* Update responsive breakpoints if needed */
+@media (max-width: 1200px) {
+    .cell {
+        min-height: 30px;
+        max-height: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .cell {
+        min-height: 25px;
+        max-height: 35px;
+    }
+}
+
+/* Final Overrides - Paste at end of styles.css */
+.container {
+    max-width: 1800px;
+}
+
+.main-section,
+.sequencer,
+.control-panel,
+.effects-panel,
+.visualizer-container,
+.keyboard-shortcuts {
+    max-width: none;
+    width: 100%;
+}
+
+.sequencer {
+    padding: var(--spacing-md);
+}
+
+.track {
+    padding: var(--spacing-sm);
+}
+
+.track-name {
+    grid-template-columns: 100px 1fr auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.9rem;
+}
+
+.grid {
+    gap: 2px;
+    padding: var(--spacing-xs);
+}
+
+.cell {
+    min-height: 30px;
+    max-height: 35px;
+    min-width: 0;
+}
+
+.grid[style*="grid-template-columns: repeat(24,"] .cell {
+    min-height: 28px;
+    max-height: 32px;
+}
+
+.grid[style*="grid-template-columns: repeat(28,"] .cell {
+    min-height: 25px;
+    max-height: 30px;
+}
+
+.grid[style*="grid-template-columns: repeat(32,"] .cell {
+    min-height: 22px;
+    max-height: 28px;
+}
+
+@media (max-width: 1400px) {
+    .cell {
+        min-height: 25px;
+        max-height: 30px;
+    }
+    
+    .grid[style*="grid-template-columns: repeat(24,"] .cell,
+    .grid[style*="grid-template-columns: repeat(28,"] .cell,
+    .grid[style*="grid-template-columns: repeat(32,"] .cell {
+        min-height: 20px;
+        max-height: 25px;
+    }
+}
+
+/* Final Overrides - Paste at end of styles.css */
+.container {
+    max-width: 1800px;
+}
+
+.main-section,
+.sequencer,
+.control-panel,
+.effects-panel,
+.visualizer-container,
+.keyboard-shortcuts {
+    max-width: none;
+    width: 100%;
+}
+
+.sequencer {
+    padding: var(--spacing-md);
+}
+
+.track {
+    padding: var(--spacing-sm);
+}
+
+.track-name {
+    grid-template-columns: 100px 1fr auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.9rem;
+}
+
+.grid {
+    gap: 2px;
+    padding: var(--spacing-xs);
+}
+
+/* Default size for 16 steps */
+.cell {
+    min-height: 40px;
+    max-height: 45px;
+    min-width: 0;
+}
+
+/* Progressively smaller sizes as steps increase */
+.grid[style*="grid-template-columns: repeat(20,"] .cell {
+    min-height: 35px;
+    max-height: 40px;
+}
+
+.grid[style*="grid-template-columns: repeat(24,"] .cell {
+    min-height: 30px;
+    max-height: 35px;
+}
+
+.grid[style*="grid-template-columns: repeat(28,"] .cell {
+    min-height: 25px;
+    max-height: 30px;
+}
+
+.grid[style*="grid-template-columns: repeat(32,"] .cell {
+    min-height: 22px;
+    max-height: 27px;
+}
+
+/* Larger sizes for fewer steps */
+.grid[style*="grid-template-columns: repeat(12,"] .cell {
+    min-height: 45px;
+    max-height: 50px;
+}
+
+.grid[style*="grid-template-columns: repeat(8,"] .cell {
+    min-height: 50px;
+    max-height: 55px;
+}
+
+.grid[style*="grid-template-columns: repeat(4,"] .cell {
+    min-height: 55px;
+    max-height: 60px;
+}
+
+@media (max-width: 1400px) {
+    .cell {
+        min-height: 35px;
+        max-height: 40px;
+    }
+    
+    .grid[style*="grid-template-columns: repeat(24,"] .cell,
+    .grid[style*="grid-template-columns: repeat(28,"] .cell,
+    .grid[style*="grid-template-columns: repeat(32,"] .cell {
+        min-height: 20px;
+        max-height: 25px;
+    }
+}
