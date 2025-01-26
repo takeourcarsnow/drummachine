@@ -212,6 +212,8 @@ class DrumMachine {
     }
         
         setupEventListeners() {
+			document.getElementById('playButtonTop').addEventListener('click', () => this.togglePlay());
+document.getElementById('playButtonBottom').addEventListener('click', () => this.togglePlay());
 			// Add inside setupEventListeners()
 const visualizerContainer = document.querySelector('.visualizer-container');
 visualizerContainer.style.cursor = 'pointer'; // Make it look clickable
@@ -737,21 +739,25 @@ drawParticles(width, height) {
     }
 
     togglePlay() {
-        if (this.playing) {
-            Tone.Transport.stop();
-            this.sequence?.stop();
-            this.playing = false;
-            document.getElementById('playButton').textContent = 'START';
-            document.getElementById('status').textContent = 'Stopped';
-        } else {
-            Tone.start();
-            this.setupSequence();
-            Tone.Transport.start();
-            this.playing = true;
-            document.getElementById('playButton').textContent = 'STOP';
-            document.getElementById('status').textContent = 'Playing';
-        }
+    if (this.playing) {
+        Tone.Transport.stop();
+        this.sequence?.stop();
+        this.playing = false;
+        document.getElementById('playButton').textContent = 'START';
+        document.getElementById('playButtonTop').textContent = 'START';
+        document.getElementById('playButtonBottom').textContent = 'START';
+        document.getElementById('status').textContent = 'Stopped';
+    } else {
+        Tone.start();
+        this.setupSequence();
+        Tone.Transport.start();
+        this.playing = true;
+        document.getElementById('playButton').textContent = 'STOP';
+        document.getElementById('playButtonTop').textContent = 'STOP';
+        document.getElementById('playButtonBottom').textContent = 'STOP';
+        document.getElementById('status').textContent = 'Playing';
     }
+}
 
     setupSequence() {
         if (this.sequence) this.sequence.dispose();

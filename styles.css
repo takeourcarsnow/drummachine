@@ -1072,3 +1072,98 @@ button {
         font-size: 0.7rem;
     }
 }
+
+/* Add to your final overrides */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;  /* Changed from center to allow for multi-line title section */
+}
+
+.title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tagline {
+    color: var(--accent-secondary);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.description {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    max-width: 600px;
+    letter-spacing: 0.5px;
+}
+
+/* Update mobile styles */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-md);
+        text-align: center;
+    }
+
+    .title-section {
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tagline {
+        font-size: 0.8rem;
+    }
+
+    .description {
+        font-size: 0.75rem;
+        padding: 0 var(--spacing-sm);
+    }
+}
+
+/* Add to your final overrides */
+.play-controls {
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-md);
+    width: 100%;
+}
+
+.play-btn {
+    min-width: 200px;
+    font-size: 1.1rem;
+    padding: var(--spacing-md) var(--spacing-xl);
+}
+
+/* Update existing play button styles */
+#playButton,
+#playButtonTop,
+#playButtonBottom {
+    background: var(--accent-primary);
+    color: var(--bg-primary);
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+#playButton:hover,
+#playButtonTop:hover,
+#playButtonBottom:hover {
+    background: var(--accent-secondary);
+    box-shadow: var(--glow-secondary);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .play-controls {
+        padding: var(--spacing-sm);
+    }
+
+    .play-btn {
+        min-width: 160px;
+        font-size: 1rem;
+        padding: var(--spacing-sm) var(--spacing-lg);
+    }
+}

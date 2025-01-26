@@ -11,15 +11,20 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="header-content">
-                <h1>TERMINAL DRUM MACHINE</h1>
-                <div class="status-panel">
-                    <span id="status">Ready...</span>
-                    <span id="time">00:00:00</span>
-                </div>
+<header>
+    <div class="header-content">
+        <div class="title-section">
+            <h1>TERMINAL DRUM MACHINE</h1>
+            <div class="tagline">Command-line inspired drum sequencer</div>
+            <div class="description">
+                Create beats with 7 instruments • Up to 32 steps • Real-time visualization • MIDI-style controls
             </div>
-        </header>
+        </div>
+        <div class="status-panel">
+            <span id="status">Ready...</span>
+        </div>
+    </div>
+</header>
 
         <div class="main-section">
             <div class="control-panel">
@@ -90,10 +95,16 @@
                     <span id="peak-meter">Peak: -∞dB</span>
                 </div>
             </div>
+<div class="play-controls">
+    <button id="playButtonTop" class="main-btn play-btn">START</button>
+</div>
 
+<div id="sequencer" class="sequencer"></div>
             <div id="sequencer" class="sequencer"></div>
         </div>
-
+<div class="play-controls">
+    <button id="playButtonBottom" class="main-btn play-btn">START</button>
+</div>
         <div class="keyboard-shortcuts">
             <h3>Keyboard Shortcuts</h3>
             <div class="shortcuts-grid">
