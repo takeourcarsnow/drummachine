@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Transport from '../components/Transport'
 import DrumGrid from '../components/DrumGrid'
 import SynthControls from '../components/SynthControls'
-import Keyboard from '../components/Keyboard'
 import Legend from '../components/Legend'
 import { ensureAudio } from '../components/audio'
+
+const Keyboard = dynamic(() => import('../components/Keyboard'), { ssr: false })
 
 export default function Home() {
   const [audioInitialized, setAudioInitialized] = useState(false)

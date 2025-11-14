@@ -21,10 +21,14 @@ export let pulse125: PeriodicWave | null = null
 export const trackGains: GainNode[] = []
 
 let noiseBuffer: AudioBuffer | null = null
+let bitCrusherCurves = new Map<number, Float32Array>()
 
 export function ensureAudio() {
   if (audioCtx) return
   audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(console.error)
+  }
 
   masterGain = audioCtx.createGain()
   masterGain.gain.value = 0.9
@@ -103,6 +107,9 @@ function makePulseWave(width: number): PeriodicWave {
 }
 
 function makeBitCrusherCurve(bitDepth: number): Float32Array {
+  if (bitCrusherCurves.has(bitDepth)) {
+    return bitCrusherCurves.get(bitDepth)!
+  }
   const n = 1 << 16
   const curve = new Float32Array(n)
   const levels = Math.pow(2, bitDepth)
@@ -111,6 +118,7 @@ function makeBitCrusherCurve(bitDepth: number): Float32Array {
     const y = Math.round((x + 1) * 0.5 * (levels - 1)) / (levels - 1) * 2 - 1
     curve[i] = y
   }
+  bitCrusherCurves.set(bitDepth, curve)
   return curve
 }
 

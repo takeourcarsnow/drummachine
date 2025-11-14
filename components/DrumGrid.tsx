@@ -5,7 +5,7 @@ import { useApp } from './AppContext'
 import { NUM_STEPS, TRACKS } from './constants'
 import { setTrackVolume } from './audio'
 
-export default function DrumGrid() {
+const DrumGrid = () => {
   const { state, updateState, toggleCell, setCell, toggleMute, toggleSolo } = useApp()
 
   return (
@@ -95,3 +95,5 @@ export default function DrumGrid() {
     </div>
   )
 }
+
+export default React.memo(DrumGrid)

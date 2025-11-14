@@ -50,7 +50,16 @@ const AppContext = createContext<AppContextType | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(initialState)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const currentStepRef = useRef(state.currentStep)
+  const bpmRef = useRef(state.bpm)
+  const swingAmtRef = useRef(state.swingAmt)
+  const patternRef = useRef(state.pattern)
+  const trackStateRef = useRef(state.trackState)
+
+  const updateState = useCallback((updates: Partial<AppState>) => {
+    setState(prev => ({ ...prev, ...updates }))
+  }, [])
 
   useEffect(() => {
     setDrumHumanizeMs(state.humanizeMs)
@@ -81,38 +90,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [state.volumes])
 
   useEffect(() => {
+    currentStepRef.current = state.currentStep
+    bpmRef.current = state.bpm
+    swingAmtRef.current = state.swingAmt
+    patternRef.current = state.pattern
+    trackStateRef.current = state.trackState
+  }, [state.currentStep, state.bpm, state.swingAmt, state.pattern, state.trackState])
+
+  useEffect(() => {
+    const scheduleNext = () => {
+      if (!state.isPlaying) return
+      const now = audioCtx ? audioCtx.currentTime : 0
+      const hasSolo = trackStateRef.current.some(ts => ts.solo)
+      for (let track = 0; track < TRACKS.length; track++) {
+        const val = patternRef.current[track][currentStepRef.current]
+        const ts = trackStateRef.current[track]
+        if (val > 0 && !ts.mute && (!hasSolo || ts.solo)) {
+          const accentMul = val === 2 ? 1.5 : 1
+          triggerDrum(track, now, accentMul)
+        }
+      }
+      const nextStep = (currentStepRef.current + 1) % NUM_STEPS
+      updateState({ currentStep: nextStep })
+      // calculate delay
+      const baseStepTime = 60 / bpmRef.current / 4
+      const swingFactor = nextStep % 2 === 0 ? 1 - swingAmtRef.current : 1 + swingAmtRef.current
+      const stepTime = baseStepTime * swingFactor
+      timeoutRef.current = setTimeout(scheduleNext, stepTime * 1000)
+    }
     if (state.isPlaying) {
-      const stepTime = 60 / state.bpm / 4 // 16th notes
-      intervalRef.current = setInterval(() => {
-        setState(prev => {
-          const nextStep = (prev.currentStep + 1) % NUM_STEPS
-          // Trigger drums
-          const hasSolo = prev.trackState.some(ts => ts.solo)
-          for (let track = 0; track < TRACKS.length; track++) {
-            const val = prev.pattern[track][prev.currentStep]
-            const ts = prev.trackState[track]
-            if (val > 0 && !ts.mute && (!hasSolo || ts.solo)) {
-              const accentMul = val === 2 ? 1.5 : 1
-              triggerDrum(track, audioCtx ? audioCtx.currentTime : 0, accentMul)
-            }
-          }
-          return { ...prev, currentStep: nextStep }
-        })
-      }, stepTime * 1000)
+      if (!timeoutRef.current) {
+        scheduleNext()
+      }
     } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
       }
     }
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
-  }, [state.isPlaying, state.bpm, state.pattern, state.trackState])
-
-  const updateState = useCallback((updates: Partial<AppState>) => {
-    setState(prev => ({ ...prev, ...updates }))
-  }, [])
+  }, [state.isPlaying, updateState])
 
   const toggleCell = useCallback((track: number, step: number) => {
     setState(prev => {

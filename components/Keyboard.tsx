@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useCallback, useRef } from 'react'
+import React, { useEffect, useCallback, useRef, useState } from 'react'
 import { synthNoteOn, synthNoteOff } from './synth-engine'
 
 export default function Keyboard() {
@@ -18,16 +18,19 @@ export default function Keyboard() {
   ]
 
   const pressedKeysRef = useRef(new Set<number>())
+  const [activeNotes, setActiveNotes] = useState(new Set<number>())
 
   const handleKeyDown = useCallback((semi: number) => {
     if (!pressedKeysRef.current.has(semi)) {
       pressedKeysRef.current.add(semi)
       synthNoteOn(semi)
+      setActiveNotes(prev => new Set(prev).add(semi % 12))
     }
   }, [])
 
   const handleKeyUp = useCallback((semi: number) => {
     pressedKeysRef.current.delete(semi)
+    setActiveNotes(prev => { const s = new Set(prev); s.delete(semi % 12); return s })
     if (pressedKeysRef.current.size === 0) {
       synthNoteOff()
     }
@@ -35,7 +38,8 @@ export default function Keyboard() {
 
   useEffect(() => {
     const keyMap: { [key: string]: number } = {
-      'z': 0, 's': 1, 'x': 2, 'd': 3, 'c': 4, 'v': 5, 'g': 6, 'b': 7, 'h': 8, 'n': 9, 'j': 10, 'm': 11, ',': 12
+      'z': 0, 's': 1, 'x': 2, 'd': 3, 'c': 4, 'v': 5, 'g': 6, 'b': 7, 'h': 8, 'n': 9, 'j': 10, 'm': 11, ',': 12,
+      'q': 12, '2': 13, 'w': 14, '3': 15, 'e': 16, 'r': 17, '5': 18, 't': 19, '6': 20, 'y': 21, '7': 22, 'u': 23, 'i': 24
     }
     const handleKeyDownEvent = (e: KeyboardEvent) => {
       const semi = keyMap[e.key.toLowerCase()]
@@ -68,7 +72,7 @@ export default function Keyboard() {
           {whiteKeyOrder.map((semi, i) => (
             <div
               key={semi}
-              className="key kb-note"
+              className={`key kb-note ${activeNotes.has(semi) ? 'active' : ''}`}
               data-note={semi.toString()}
               onMouseDown={() => handleKeyDown(semi)}
               onMouseUp={() => handleKeyUp(semi)}
@@ -85,7 +89,7 @@ export default function Keyboard() {
           {blackMap.map(({ semi, pos, offset }) => (
             <div
               key={semi}
-              className="key black kb-note"
+              className={`key black kb-note ${activeNotes.has(semi) ? 'active' : ''}`}
               data-note={semi.toString()}
               onMouseDown={() => handleKeyDown(semi)}
               onMouseUp={() => handleKeyUp(semi)}

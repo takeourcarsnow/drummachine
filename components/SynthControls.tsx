@@ -1,8 +1,9 @@
 'use client'
 
+import React from 'react'
 import { useApp } from './AppContext'
 
-export default function SynthControls() {
+const SynthControls = () => {
   const { state, updateState } = useApp()
 
   const handleWaveChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -221,3 +222,5 @@ export default function SynthControls() {
     </div>
   )
 }
+
+export default React.memo(SynthControls)
