@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useRef } from 'react'
 import { synthNoteOn, synthNoteOff } from './synth-engine'
 
 export default function Keyboard() {
@@ -17,12 +17,20 @@ export default function Keyboard() {
     { semi: 10, pos: 5, offset: 30 },
   ]
 
+  const pressedKeysRef = useRef(new Set<number>())
+
   const handleKeyDown = useCallback((semi: number) => {
-    synthNoteOn(semi)
+    if (!pressedKeysRef.current.has(semi)) {
+      pressedKeysRef.current.add(semi)
+      synthNoteOn(semi)
+    }
   }, [])
 
-  const handleKeyUp = useCallback(() => {
-    synthNoteOff()
+  const handleKeyUp = useCallback((semi: number) => {
+    pressedKeysRef.current.delete(semi)
+    if (pressedKeysRef.current.size === 0) {
+      synthNoteOff()
+    }
   }, [])
 
   useEffect(() => {
@@ -37,9 +45,10 @@ export default function Keyboard() {
       }
     }
     const handleKeyUpEvent = (e: KeyboardEvent) => {
-      if (keyMap[e.key.toLowerCase()] !== undefined) {
+      const semi = keyMap[e.key.toLowerCase()]
+      if (semi !== undefined) {
         e.preventDefault()
-        handleKeyUp()
+        handleKeyUp(semi)
       }
     }
     window.addEventListener('keydown', handleKeyDownEvent)
@@ -62,8 +71,8 @@ export default function Keyboard() {
               className="key kb-note"
               data-note={semi.toString()}
               onMouseDown={() => handleKeyDown(semi)}
-              onMouseUp={handleKeyUp}
-              onMouseLeave={handleKeyUp}
+              onMouseUp={() => handleKeyUp(semi)}
+              onMouseLeave={() => handleKeyUp(semi)}
               style={{
                 left: `${i * whiteW}px`,
                 top: '8px',
@@ -79,8 +88,8 @@ export default function Keyboard() {
               className="key black kb-note"
               data-note={semi.toString()}
               onMouseDown={() => handleKeyDown(semi)}
-              onMouseUp={handleKeyUp}
-              onMouseLeave={handleKeyUp}
+              onMouseUp={() => handleKeyUp(semi)}
+              onMouseLeave={() => handleKeyUp(semi)}
               style={{
                 left: `${pos * whiteW + offset}px`,
                 top: '8px',
