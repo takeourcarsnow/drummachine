@@ -16,7 +16,7 @@ CHIP-TRAX is a browser-based 8-bit chiptune drum machine and monophonic synthesi
 
 ## Usage
 
-1. **Open `index.html` in your browser** (Chrome recommended for best WebAudio support).
+1. **Run the development server**: `npm run dev` and open `http://localhost:3000` in your browser (Chrome recommended for best WebAudio support).
 2. **Create beats** by clicking pads in the drum grid. Alt/Option-click for accents.
 3. **Play the synth** using your computer keyboard (Z/S/X/D/C... for lower octave, Q/2/W/3/E... for upper).
 4. **Adjust controls** for BPM, swing, humanize, synth parameters, and more.
@@ -35,26 +35,34 @@ CHIP-TRAX is a browser-based 8-bit chiptune drum machine and monophonic synthesi
 
 ## File Structure
 
-- `index.html` — Main HTML UI
-- `styles.css` — CRT/retro-inspired styles
-- `js/` — All JavaScript modules:
-  - `audio.js` — WebAudio engine for drums & synth
-  - `constants.js` — Track and step definitions
-  - `controls-synth.js` — Synth parameter controls
-  - `controls-transport.js` — Transport (play, BPM, swing, etc.)
-  - `grid.js` — Drum grid UI
-  - `keyboard.js` — Computer keyboard input
-  - `main.js` — App entry point
-  - `pattern.js` — Pattern data & starter groove
-  - `state.js` — Save/load/share state
-  - `tools.js` — Randomize, clear, save, load, share
-  - `transport.js` — Sequencer timing
-  - `utils.js` — DOM and math helpers
-  - `volumes.js` — Per-track volume controls
+- `app/` — Next.js app directory:
+  - `layout.tsx` — Root layout
+  - `page.tsx` — Main page
+  - `globals.css` — Global styles
+- `components/` — React components:
+  - `AppContext.tsx` — Application context
+  - `audio-context.ts` — Audio context setup
+  - `audio.ts` — Audio utilities
+  - `constants.ts` — Constants and definitions
+  - `drum-synthesis.ts` — Drum synthesis logic
+  - `DrumGrid.tsx` — Drum grid component
+  - `Keyboard.tsx` — Keyboard input component
+  - `Legend.tsx` — Legend component
+  - `synth-engine.ts` — Synth engine
+  - `SynthControls.tsx` — Synth controls component
+  - `Transport.tsx` — Transport controls
+  - `types.ts` — TypeScript types
+- `styles.css` — Additional styles
+- `next.config.js` — Next.js configuration
+- `tsconfig.json` — TypeScript configuration
+- `package.json` — Dependencies and scripts
 
 ## Installation & Development
 
-No installation required! Just clone/download and open `index.html` in your browser.
+1. Clone the repository: `git clone https://github.com/takeourcarsnow/drummachine.git`
+2. Install dependencies: `npm install`
+3. Run the development server: `npm run dev`
+4. Open `http://localhost:3000` in your browser.
 
 ## License
 
