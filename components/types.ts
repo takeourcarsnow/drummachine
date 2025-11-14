@@ -29,4 +29,6 @@ export interface AppState {
   trackState: TrackState[];
   synth: SynthParams;
   master: number;
+  isPlaying: boolean;
+  currentStep: number;
 }

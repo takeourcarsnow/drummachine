@@ -6,6 +6,7 @@ import DrumGrid from '../components/DrumGrid'
 import SynthControls from '../components/SynthControls'
 import Keyboard from '../components/Keyboard'
 import Legend from '../components/Legend'
+import { ensureAudio } from '../components/audio'
 
 export default function Home() {
   const [audioInitialized, setAudioInitialized] = useState(false)
@@ -13,7 +14,7 @@ export default function Home() {
   useEffect(() => {
     // Initialize audio on first interaction
     const initAudio = () => {
-      // Audio initialization logic here
+      ensureAudio()
       setAudioInitialized(true)
     }
 

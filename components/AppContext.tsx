@@ -1,8 +1,10 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
 import { AppState, TrackState, SynthParams } from './types'
 import { NUM_STEPS, TRACKS } from './constants'
+import { triggerDrum, setDrumHumanizeMs, audioCtx, setSynthWaveType, setBits, setVibratoRate, setVibratoDepth, setMasterVol, setSynthVol, setTrackVolume, setFilterCutoff, setFilterReso } from './audio'
+import { setAttack, setDecay, setSustain, setRelease, setGlide, setOctave } from './synth-engine'
 
 const initialState: AppState = {
   v: 2,
@@ -27,7 +29,9 @@ const initialState: AppState = {
     octave: 0,
     vol: 0.75
   },
-  master: 0.9
+  master: 0.9,
+  isPlaying: false,
+  currentStep: 0
 }
 
 interface AppContextType {
@@ -39,12 +43,72 @@ interface AppContextType {
   toggleSolo: (track: number) => void
   randomize: () => void
   clear: () => void
+  togglePlay: () => void
 }
 
 const AppContext = createContext<AppContextType | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppState>(initialState)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    setDrumHumanizeMs(state.humanizeMs)
+  }, [state.humanizeMs])
+
+  useEffect(() => {
+    setMasterVol(state.master)
+  }, [state.master])
+
+  useEffect(() => {
+    setSynthWaveType(state.synth.wave)
+    setAttack(state.synth.attack)
+    setDecay(state.synth.decay)
+    setSustain(state.synth.sustain)
+    setRelease(state.synth.release)
+    setGlide(state.synth.glide)
+    setBits(state.synth.bits)
+    setFilterCutoff(state.synth.cutoff)
+    setFilterReso(state.synth.reso)
+    setVibratoRate(state.synth.vibRate)
+    setVibratoDepth(state.synth.vibDepth)
+    setOctave(state.synth.octave)
+    setSynthVol(state.synth.vol)
+  }, [state.synth])
+
+  useEffect(() => {
+    state.volumes.forEach((vol, i) => setTrackVolume(i, vol))
+  }, [state.volumes])
+
+  useEffect(() => {
+    if (state.isPlaying) {
+      const stepTime = 60 / state.bpm / 4 // 16th notes
+      intervalRef.current = setInterval(() => {
+        setState(prev => {
+          const nextStep = (prev.currentStep + 1) % NUM_STEPS
+          // Trigger drums
+          const hasSolo = prev.trackState.some(ts => ts.solo)
+          for (let track = 0; track < TRACKS.length; track++) {
+            const val = prev.pattern[track][prev.currentStep]
+            const ts = prev.trackState[track]
+            if (val > 0 && !ts.mute && (!hasSolo || ts.solo)) {
+              const accentMul = val === 2 ? 1.5 : 1
+              triggerDrum(track, audioCtx ? audioCtx.currentTime : 0, accentMul)
+            }
+          }
+          return { ...prev, currentStep: nextStep }
+        })
+      }, stepTime * 1000)
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [state.isPlaying, state.bpm, state.pattern, state.trackState])
 
   const updateState = useCallback((updates: Partial<AppState>) => {
     setState(prev => ({ ...prev, ...updates }))
@@ -102,6 +166,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }))
   }, [])
 
+  const togglePlay = useCallback(() => {
+    setState(prev => ({ ...prev, isPlaying: !prev.isPlaying }))
+  }, [])
+
   return (
     <AppContext.Provider value={{
       state,
@@ -111,7 +179,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       toggleMute,
       toggleSolo,
       randomize,
-      clear
+      clear,
+      togglePlay
     }}>
       {children}
     </AppContext.Provider>

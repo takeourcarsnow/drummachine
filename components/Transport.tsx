@@ -3,10 +3,10 @@
 import { useApp } from './AppContext'
 
 export default function Transport() {
-  const { state, updateState } = useApp()
+  const { state, updateState, togglePlay, randomize, clear } = useApp()
 
   const handlePlay = () => {
-    // TODO: implement play/stop
+    togglePlay()
   }
 
   const handleTap = () => {
@@ -34,11 +34,11 @@ export default function Transport() {
   }
 
   const handleRandomize = () => {
-    // TODO: randomize
+    randomize()
   }
 
   const handleClear = () => {
-    // TODO: clear
+    clear()
   }
 
   const handleSave = () => {
@@ -62,7 +62,7 @@ export default function Transport() {
     <div className="row panel">
       <div className="title">Transport & Groove</div>
       <div className="controls">
-        <button className="btn" onClick={handlePlay}>▶ Play</button>
+        <button className="btn" onClick={handlePlay}>{state.isPlaying ? 'Stop' : 'Play'}</button>
         <button className="btn" onClick={handleTap}>Tap</button>
         <div className="ctrl">
           <label htmlFor="bpm">BPM</label>

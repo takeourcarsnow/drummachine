@@ -3,6 +3,7 @@
 import React from 'react'
 import { useApp } from './AppContext'
 import { NUM_STEPS, TRACKS } from './constants'
+import { setTrackVolume } from './audio'
 
 export default function DrumGrid() {
   const { state, updateState, toggleCell, setCell, toggleMute, toggleSolo } = useApp()
@@ -47,7 +48,7 @@ export default function DrumGrid() {
               return (
                 <div
                   key={s}
-                  className={`cell ${s % 2 === 0 ? 'even' : ''} ${val > 0 ? 'active' : ''} ${val === 2 ? 'accent' : ''}`}
+                  className={`cell ${s % 2 === 0 ? 'even' : ''} ${val > 0 ? 'active' : ''} ${val === 2 ? 'accent' : ''} ${s === state.currentStep ? 'playing' : ''}`}
                   onClick={(e) => {
                     if (e.altKey) {
                       const newVal = val === 2 ? 1 : 2
@@ -80,6 +81,7 @@ export default function DrumGrid() {
                 const newVolumes = [...state.volumes]
                 newVolumes[i] = parseFloat(e.target.value)
                 updateState({ volumes: newVolumes })
+                setTrackVolume(i, e.target.value)
               }}
               aria-label={`${track.name} Volume`}
             />
